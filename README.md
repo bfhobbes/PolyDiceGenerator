@@ -2,14 +2,12 @@
 
 A customizable **Polyhedral Dice Generator** for OpenSCAD.
 
-![Image of dice](images/render_v0.26.9.png)
+![Image of dice](images/render_v0.27.4.png)
 
 ## Requirements
 
 - OpenSCAD <http://www.openscad.org>
 - The BOSL2 library <https://github.com/revarbat/BOSL2#installation>
-
-  ***Note:** Due to recent BOSL2 updates v2.0.402 is currently required. It can be found here: <https://github.com/revarbat/BOSL2/tree/e56f953c1cd8db7e7e198e6d7d49650f133ab92a>*
 
 ## Adding Text to Dice
 
@@ -69,6 +67,13 @@ Text, numbers, underscores, and symbols are added to dice by creating lists of v
   ***Example:*** `d6_adj_v_push=[0,2,0,0,0,0];`
   - Bracket enclosed `[]` non-quoted numbers seperated by commas `,`.
   - The values entered here will be added to the die's existing `d(n)_text_h_push` value.
+
+- **Adjust Spacing** - A list for altering the spacing between double digit elements. In this example the spacing between the `1` and `2` in the number `12` of the `d12` will be increased by `0.2`.
+
+  ***Example:*** `d12_adj_spacing=[0,0,0,0,0,0,0,0,0,0,0.2,0];`
+  - Bracket enclosed `[]` non-quoted numbers seperated by commas `,`.
+  - The values entered here are added to the die's existing `d(n)_text_spacing` value.
+  - Only avaliable where double digits are likely to occur.
 
 - **Adjust Depth** - A list for altering the depth of individual elements. In this example the number `5` will be extruded by an assitional `0.5`mm.
 
@@ -173,11 +178,25 @@ Text, numbers, underscores, and symbols are added to dice by creating lists of v
 |`d4c_body_length`      |Body length adjustment for `d4c`. |
 |`d4c_point_length`     |Point length adjustment for `d4c`.|
 |`d4c_pip_dist`         |User-defined list for adding and distributing pips to the `d4c`.|
+|`d4c_pip_sides`        |Number of sides adjustment for `d4c` pips.|
 |`d4c_pip_size`         |Size adjustment for `d4c` pips.|
 |`d4c_pip_offset`       |Adjustment for distance between `d4c` pips.|
 |`d4c_pip_symbol_dist`  |User-defined list for setting up symbol distribution in pip patterns on the `d4c`. The list should contain numbers `"1"` thru `"4"`, the order of which will likely mimic those set in `d4c_custom_dist`.|
 |`d4c_pip_symbols`      |User-defined list for adding symbols in place of `d4c` pips.|
 |`d4c_pip_symbol_rotate`|User-defined list of angles for adjusting `d4c` pip symbol rotation.|
+
+### d4i Infinity
+
+|Variable Name          |Description|
+|---                    |---        |
+|`d4i_body_length`      |Body length adjustment for `d4i`. |
+|`d4i_pip_dist`         |User-defined list for adding and distributing pips to the `d4i`.|
+|`d4i_pip_sides`        |Number of sides adjustment for `d4i` pips.|
+|`d4i_pip_size`         |Size adjustment for `d4i` pips.|
+|`d4i_pip_offset`       |Adjustment for distance between `d4i` pips.|
+|`d4i_pip_symbol_dist`  |User-defined list for setting up symbol distribution in pip patterns on the `d4i`. The list should contain numbers `"1"` thru `"4"`, the order of which will likely mimic those set in `d4i_custom_dist`.|
+|`d4i_pip_symbols`      |User-defined list for adding symbols in place of `d4i` pips.|
+|`d4i_pip_symbol_rotate`|User-defined list of angles for adjusting `d4i` pip symbol rotation.|
 
 ### d4p Pyramid
 
@@ -190,8 +209,9 @@ Text, numbers, underscores, and symbols are added to dice by creating lists of v
 
 |Variable Name         |Description|
 |---                   |---        |
-|`d6_angle_text`    |Angle `d6` numbers by 45 degrees.|
+|`d6_angle_text`       |Angle `d6` numbers by 45 degrees.|
 |`d6_pip_dist`         |User-defined list for adding and distributing pips to the `d6`.|
+|`d6_pip_sides`        |Number of sides adjustment for `d6` pips.|
 |`d6_pip_size`         |Size adjustment for `d6` pips.|
 |`d6_pip_offset`       |Adjustment for distance between `d6` pips.|
 |`d6_pip_symbol_dist`  |User-defined list for setting up symbol distribution in pip patterns on the `d6`. The list should contain numbers `"1"` thru `"6"`, the order of which will likely mimic those set in `d6_custom_dist`.|
@@ -210,14 +230,14 @@ Text, numbers, underscores, and symbols are added to dice by creating lists of v
 
 ### d00 Trapezohedron
 
-|Variable Name      |Description|
-|---                |---        |
-|`d00_length_mod`   |Point length adjustment for the `d00`.|
-|`d00_angle_text`|Angle `d00` numbers by `90` degrees.|
-|`d00_0_size`       |Size adjustment for the `d00` 2nd digit `"0"`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
-|`d00_0_padding`    |Spacing adjustment between the `d00` 1st digit number and 2nd digit `"0"`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
-|`d00_10_h_push`    |Horizontal push adjustment for `d00` `#10`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
-|`d00_10_0_padding` |Spacing adjustment for `d00` `#10` 2nd digit `"0"`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
+|Variable Name     |Description|
+|---               |---        |
+|`d00_length_mod`  |Point length adjustment for the `d00`.|
+|`d00_angle_text`  |Angle `d00` numbers by `90` degrees.|
+|`d00_0_size`      |Size adjustment for the `d00` 2nd digit `"0"`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
+|`d00_0_padding`   |Spacing adjustment between the `d00` 1st digit number and 2nd digit `"0"`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
+|`d00_10_h_push`   |Horizontal push adjustment for `d00` `#10`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
+|`d00_10_0_padding`|Spacing adjustment for `d00` `#10` 2nd digit `"0"`. Only applies when `d00_angle_text` is `checked` or set to `true`.|
 
 ### d12 Dodecahedron
 

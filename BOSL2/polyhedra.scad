@@ -1,11 +1,9 @@
 //////////////////////////////////////////////////////////////////////
 // LibFile: polyhedra.scad
 //   Useful platonic, archimedian, and catalan polyhedra.
-//   To use, add the following lines to the beginning of your file:
-//   ```
+// Includes:
 //   include <BOSL2/std.scad>
 //   include <BOSL2/polyhedra.scad>
-//   ```
 //////////////////////////////////////////////////////////////////////
 
 
@@ -123,6 +121,7 @@ function _unique_groups(m) = [
 //
 // Arguments:
 //   name = Name of polyhedron to create.
+//   ---
 //   index = Index to select from polyhedron list.  Default: 0.
 //   type = Type of polyhedron: "platonic", "archimedean", "catalan".
 //   faces = Number of faces.
@@ -283,7 +282,7 @@ module regular_polyhedron(
     faces=undef,
     facetype=undef,
     hasfaces=undef,
-    side=1,
+    side=undef,
     ir=undef,
     mr=undef,
     or=undef,
@@ -543,7 +542,8 @@ _stellated_polyhedra_ = [
 
 // Function: regular_polyhedron_info()
 //
-// Usage: regular_polyhedron_info(info, ....)
+// Usage:
+//   x = regular_polyhedron_info(info, ....);
 //
 // Description:
 //   Calculate characteristics of regular polyhedra or the selection set for regular_polyhedron().
@@ -565,6 +565,7 @@ _stellated_polyhedra_ = [
 //
 // Arguments:
 //   name = Name of polyhedron to create.
+//   ---
 //   index = Index to select from polyhedron list.  Default: 0.
 //   type = Type of polyhedron: "platonic", "archimedean", "catalan".
 //   faces = Number of faces.
@@ -590,7 +591,7 @@ function regular_polyhedron_info(
     info=undef, name=undef,
     index=undef, type=undef,
     faces=undef, facetype=undef,
-    hasfaces=undef, side=1,
+    hasfaces=undef, side=undef,
     ir=undef, mr=undef, or=undef,
     r=undef, d=undef,
     anchor=[0,0,0], center=undef,
@@ -601,7 +602,7 @@ function regular_polyhedron_info(
         argcount = num_defined([ir,mr,or,r,d])
     )
     assert(argcount<=1, "You must specify only one of 'ir', 'mr', 'or', 'r', and 'd'")
-    let(
+    let(  
         //////////////////////
         //Index values into the _polyhedra_ array
         //
@@ -652,7 +653,7 @@ function regular_polyhedron_info(
     let(
         entry = (
             name == "trapezohedron"? (
-                trapezohedron(faces=faces, side=side, longside=longside, h=h, r=r)
+                _trapezohedron(faces=faces, side=side, longside=longside, h=h, r=r)
             ) : (
                 _polyhedra_[!is_undef(index)?
                     indexlist[index] :
@@ -663,6 +664,7 @@ function regular_polyhedron_info(
     )
     assert(valid_facedown,str("'facedown' set to ",facedown," but selected polygon only has faces with size(s) ",entry[facevertices]))
     let(
+        side = default(side,1),   // This default setting must occur after _trapezohedron is called
         scalefactor = (
             name=="trapezohedron" ? 1 : (
                 argcount == 0? side :
@@ -671,7 +673,7 @@ function regular_polyhedron_info(
             ) / entry[edgelen]
         ),
         face_triangles = hull(entry[vertices]),
-        faces_normals_vertices = stellate_faces(
+        faces_normals_vertices = _stellate_faces(
             entry[edgelen], stellate, entry[vertices],
             entry[facevertices]==[3]?
                 [face_triangles, [for(face=face_triangles) _facenormal(entry[vertices],face)]] :
@@ -687,7 +689,7 @@ function regular_polyhedron_info(
         boundtable = [bounds[0], [0,0,0], bounds[1]],
         translation = [for(i=[0:2]) -boundtable[1+anchor[i]][i]],
         face_normals = rot(p=faces_normals_vertices[1], from=down_direction, to=[0,0,-1]),
-        side_length = scalefactor * entry[edgelen]
+        radius_scale = name=="trapezohedron" ? 1 : scalefactor * entry[edgelen]
     )
     info == "fullentry" ? [
         scaled_points,
@@ -695,15 +697,15 @@ function regular_polyhedron_info(
         stellate ? faces : face_triangles,
         faces,
         face_normals,
-        side_length*entry[in_radius]
+        radius_scale*entry[in_radius]
     ] :
     info == "vnf" ? [move(translation,p=scaled_points), stellate ? faces : face_triangles] : 
     info == "vertices" ? move(translation,p=scaled_points) :
     info == "faces" ? faces :
     info == "face normals" ? face_normals :
-    info == "in_radius" ? side_length * entry[in_radius] :
-    info == "mid_radius" ? side_length * entry[mid_radius] :
-    info == "out_radius" ? side_length * entry[out_radius] :
+    info == "in_radius" ? radius_scale * entry[in_radius] :
+    info == "mid_radius" ? radius_scale * entry[mid_radius] :
+    info == "out_radius" ? radius_scale * entry[out_radius] :
     info == "index set" ? indexlist :
     info == "face vertices" ? (stellate==false? entry[facevertices] : [3]) :
     info == "edge length" ? scalefactor * entry[edgelen] :
@@ -713,11 +715,7 @@ function regular_polyhedron_info(
     assert(false, str("Unknown info type '",info,"' requested"));
 
 
-
-/// hull solution fails due to roundoff
-/// either cross product or just rotate to
-///
-function stellate_faces(scalefactor,stellate,vertices,faces_normals) =
+function _stellate_faces(scalefactor,stellate,vertices,faces_normals) =
     (stellate == false || stellate == 0)? concat(faces_normals,[vertices]) :
     let(
         faces = [for(face=faces_normals[0]) select(face,hull(select(vertices,face)))],
@@ -730,15 +728,16 @@ function stellate_faces(scalefactor,stellate,vertices,faces_normals) =
     ) [newfaces, normals, allpts];
 
 
-function trapezohedron(faces, r, side, longside, h) =
-    assert(faces%2==0, "Number of faces must be even")
+function _trapezohedron(faces, r, side, longside, h, d) =
+    assert(faces%2==0, "Must set 'faces' to an even number for trapezohedron")
     let(
+        r = get_radius(r=r, d=d),
         N = faces/2,
         parmcount = num_defined([r,side,longside,h])
     )
     assert(parmcount==2,"Must define exactly two of 'r', 'side', 'longside', and 'height'")
-    let(
-        separation = (
+    let(       
+        separation = (     // z distance between non-apex vertices that aren't in the same plane
             !is_undef(h) ? 2*h*sqr(tan(90/N)) :
             (!is_undef(r) && !is_undef(side))? sqrt(side*side+2*r*r*(cos(180/N)-1)) :
             (!is_undef(r) && !is_undef(longside))? 2 * sqrt(sqr(longside)-sqr(r)) / (1-sqr(tan(90/N))) * sqr(tan(90/N)) :
@@ -756,7 +755,7 @@ function trapezohedron(faces, r, side, longside, h) =
         top = [for(i=[0:1:N-1]) [r*cos(360/N*i), r*sin(360/N*i),separation/2]],
         bot = [for(i=[0:1:N-1]) [r*cos(180/N+360/N*i), r*sin(180/N+360/N*i),-separation/2]],
         vertices = concat([[0,0,h],[0,0,-h]],top,bot)
-    ) [
+    ) [  
         "trapezohedron", "trapezohedron", faces, [4],
         !is_undef(side)? side : sqrt(sqr(separation)-2*r*(cos(180/N)-1)),  // actual side length
         h*r/sqrt(r*r+sqr(h+separation/2)),     // in_radius

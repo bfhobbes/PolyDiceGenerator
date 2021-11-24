@@ -1,14 +1,12 @@
 //////////////////////////////////////////////////////////////////////
 // LibFile: version.scad
 //   File that provides functions to manage versioning.
-//   To use, add the following lines to the beginning of your file:
-//   ```
+// Includes:
 //   include <BOSL2/std.scad>
-//   ```
 //////////////////////////////////////////////////////////////////////
 
 
-BOSL_VERSION = [2,0,402];
+BOSL_VERSION = [2,0,525];
 
 
 // Section: BOSL Library Version Functions
@@ -49,6 +47,7 @@ function bosl_version_str() = version_to_str(BOSL_VERSION);
 // Description:
 //   Given a version as a list, number, or string, asserts that the currently installed BOSL library is at least the given version.
 module bosl_required(target) {
+    no_children($children);
     assert(
         version_cmp(bosl_version(), target) >= 0,
         str(

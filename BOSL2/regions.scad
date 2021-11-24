@@ -1,10 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // LibFile: regions.scad
 //   Regions and 2D boolean geometry
-//   To use, add the following lines to the beginning of your file:
-//   ```
-//   use <BOSL2/std.scad>
-//   ```
+// Includes:
+//   include <BOSL2/std.scad>
 //////////////////////////////////////////////////////////////////////
 
 
@@ -144,7 +142,7 @@ function region_path_crossings(path, region, closed=true, eps=EPSILON) = sort([
     ) let (
         isect = _general_line_intersection(segs[si], s2, eps=eps)
     ) if (
-        !is_undef(isect) &&
+        !is_undef(isect[0]) &&
         isect[1] >= 0-eps && isect[1] < 1+eps &&
         isect[2] >= 0-eps && isect[2] < 1+eps
     )
@@ -154,9 +152,9 @@ function region_path_crossings(path, region, closed=true, eps=EPSILON) = sort([
 
 // Function: split_path_at_region_crossings()
 // Usage:
-//   polylines = split_path_at_region_crossings(path, region, [eps]);
+//   paths = split_path_at_region_crossings(path, region, [eps]);
 // Description:
-//   Splits a path into polyline sections wherever the path crosses the perimeter of a region.
+//   Splits a path into sub-paths wherever the path crosses the perimeter of a region.
 //   Splits may occur mid-segment, so new vertices will be created at the intersection points.
 // Arguments:
 //   path = The path to split up.
@@ -166,9 +164,9 @@ function region_path_crossings(path, region, closed=true, eps=EPSILON) = sort([
 // Example(2D):
 //   path = square(50,center=false);
 //   region = [circle(d=80), circle(d=40)];
-//   polylines = split_path_at_region_crossings(path, region);
+//   paths = split_path_at_region_crossings(path, region);
 //   color("#aaa") region(region);
-//   rainbow(polylines) stroke($item, closed=false, width=2);
+//   rainbow(paths) stroke($item, closed=false, width=2);
 function split_path_at_region_crossings(path, region, closed=true, eps=EPSILON) =
     let(
         path = deduplicate(path, eps=eps),
@@ -180,8 +178,9 @@ function split_path_at_region_crossings(path, region, closed=true, eps=EPSILON) 
         ),
         subpaths = [
             for (p = pair(crossings))
-                deduplicate(eps=eps,
-                    path_subselect(path, p[0][0], p[0][1], p[1][0], p[1][1], closed=closed)
+                deduplicate(
+                    path_subselect(path, p[0][0], p[0][1], p[1][0], p[1][1], closed=closed),
+                    eps=eps
                 )
         ]
     )
@@ -284,8 +283,8 @@ function region_faces(region, transform, reverse=false, vnf=EMPTY_VNF) =
         vnfs = [
             if (vnf != EMPTY_VNF) vnf,
             for (rgn = regions) let(
-                cleaved = _cleave_simple_region(rgn),
-                face = is_undef(transform)? cleaved : apply(transform,path3d(cleaved)),
+                cleaved = path3d(_cleave_simple_region(rgn)),
+                face = is_undef(transform)? cleaved : apply(transform,cleaved),
                 faceidxs = reverse? [for (i=[len(face)-1:-1:0]) i] : [for (i=[0:1:len(face)-1]) i]
             ) [face, [faceidxs]]
         ],
@@ -295,7 +294,7 @@ function region_faces(region, transform, reverse=false, vnf=EMPTY_VNF) =
 
 // Function&Module: linear_sweep()
 // Usage:
-//   linear_sweep(path, height, [center], [slices], [twist], [scale], [style], [convexity]);
+//   linear_sweep(region, height, [center], [slices], [twist], [scale], [style], [convexity]);
 // Description:
 //   If called as a module, creates a polyhedron that is the linear extrusion of the given 2D region or path.
 //   If called as a function, returns a VNF that can be used to generate a polyhedron of the linear extrusion
@@ -303,19 +302,19 @@ function region_faces(region, transform, reverse=false, vnf=EMPTY_VNF) =
 //   that you can use `anchor`, `spin`, `orient` and attachments with it.  Also, you can make more refined
 //   twisted extrusions by using `maxseg` to subsample flat faces.
 // Arguments:
-//   region = The 2D [Region](regions.scad) that is to be extruded.
-//   height = The height to extrude the path.  Default: 1
+//   region = The 2D [Region](regions.scad) or path that is to be extruded.
+//   height = The height to extrude the region.  Default: 1
 //   center = If true, the created polyhedron will be vertically centered.  If false, it will be extruded upwards from the origin.  Default: `false`
 //   slices = The number of slices to divide the shape into along the Z axis, to allow refinement of detail, especially when working with a twist.  Default: `twist/5`
 //   maxseg = If given, then any long segments of the region will be subdivided to be shorter than this length.  This can refine twisting flat faces a lot.  Default: `undef` (no subsampling)
 //   twist = The number of degrees to rotate the shape clockwise around the Z axis, as it rises from bottom to top.  Default: 0
-//   scale = The amound to scale the shape, from bottom to top.  Default: 1
+//   scale = The amount to scale the shape, from bottom to top.  Default: 1
 //   style = The style to use when triangulating the surface of the object.  Valid values are `"default"`, `"alt"`, or `"quincunx"`.
-//   convexity = Max number of surfaces any single ray could pass through.
+//   convexity = Max number of surfaces any single ray could pass through.  Module use only.
 //   anchor_isect = If true, anchoring it performed by finding where the anchor vector intersects the swept shape.  Default: false
-//   anchor = Translate so anchor point is at origin (0,0,0).  See [anchor](attachments.scad#anchor).  Module use only.  Default: `CENTER`
-//   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Module use only.  Default: `0`
-//   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Module use only.  Default: `UP`
+//   anchor = Translate so anchor point is at origin (0,0,0).  See [anchor](attachments.scad#anchor).  Default: `CENTER`
+//   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
+//   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
 // Example: Extruding a Compound Region.
 //   rgn1 = [for (d=[10:10:60]) circle(d=d,$fn=8)];
 //   rgn2 = [square(30,center=false)];
@@ -354,9 +353,11 @@ module linear_sweep(region, height=1, center, twist=0, scale=1, slices, maxseg, 
 }
 
 
-function linear_sweep(region, height=1, twist=0, scale=1, slices, maxseg, style="default") =
+function linear_sweep(region, height=1, center, twist=0, scale=1, slices, maxseg, style="default", anchor_isect=false, anchor, spin=0, orient=UP) =
     let(
+        anchor = get_anchor(anchor,center,BOT,BOT),
         region = is_path(region)? [region] : region,
+        cp = mean(pointlist_bounds(flatten(region))),
         regions = split_nested_region(region),
         slices = default(slices, floor(twist/5+1)),
         step = twist/slices,
@@ -373,27 +374,28 @@ function linear_sweep(region, height=1, twist=0, scale=1, slices, maxseg, style=
                 )
                 rot(twist, p=scale([scale,scale],p=path))
             ]
-        ]
-    ) vnf_merge([
-        for (rgn = regions)
-        for (pathnum = idx(rgn)) let(
-            p = cleanup_path(rgn[pathnum]),
-            path = is_undef(maxseg)? p : [
-                for (seg=pair_wrap(p)) each
-                let(steps=ceil(norm(seg.y-seg.x)/maxseg))
-                lerp(seg.x, seg.y, [0:1/steps:1-EPSILON])
-            ],
-            verts = [
-                for (i=[0:1:slices]) let(
-                    sc = lerp(1, scale, i/slices),
-                    ang = i * step,
-                    h = i * hstep - height/2
-                ) scale([sc,sc,1], p=rot(ang, p=path3d(path,h)))
-            ]
-        ) vnf_vertex_array(verts, caps=false, col_wrap=true, style=style),
-        for (rgn = regions) region_faces(rgn, move([0,0,-height/2]), reverse=true),
-        for (rgn = trgns) region_faces(rgn, move([0,0, height/2]), reverse=false)
-    ]);
+        ],
+        vnf = vnf_merge([
+            for (rgn = regions)
+            for (pathnum = idx(rgn)) let(
+                p = cleanup_path(rgn[pathnum]),
+                path = is_undef(maxseg)? p : [
+                    for (seg=pair_wrap(p)) each
+                    let(steps=ceil(norm(seg.y-seg.x)/maxseg))
+                    lerp(seg.x, seg.y, [0:1/steps:1-EPSILON])
+                ],
+                verts = [
+                    for (i=[0:1:slices]) let(
+                        sc = lerp(1, scale, i/slices),
+                        ang = i * step,
+                        h = i * hstep - height/2
+                    ) scale([sc,sc,1], p=rot(ang, p=path3d(path,h)))
+                ]
+            ) vnf_vertex_array(verts, caps=false, col_wrap=true, style=style),
+            for (rgn = regions) region_faces(rgn, move([0,0,-height/2]), reverse=true),
+            for (rgn = trgns) region_faces(rgn, move([0,0, height/2]), reverse=false)
+        ])
+    ) reorient(anchor,spin,orient, cp=cp, vnf=vnf, extent=!anchor_isect, p=vnf);
 
 
 
@@ -531,7 +533,7 @@ function _offset_region(
             difference(_acc, [
                 offset(
                     paths[_i].y,
-                    r=-r, delta=-delta, chamfer=chamfer, closed=closed,
+                    r=u_mul(-1,r), delta=u_mul(-1,delta), chamfer=chamfer, closed=closed,
                     maxstep=maxstep, check_valid=check_valid, quality=quality,
                     return_faces=return_faces, firstface_index=firstface_index,
                     flip_faces=flip_faces
@@ -545,11 +547,14 @@ function _offset_region(
 
 
 // Function: offset()
-//
+// Usage:
+//   offsetpath = offset(path, [r|delta], [chamfer], [closed], [check_valid], [quality])
+//   path_faces = offset(path, return_faces=true, [r|delta], [chamfer], [closed], [check_valid], [quality], [firstface_index], [flip_faces])
 // Description:
 //   Takes an input path and returns a path offset by the specified amount.  As with the built-in
 //   offset() module, you can use `r` to specify rounded offset and `delta` to specify offset with
-//   corners.  Positive offsets shift the path to the left (relative to the direction of the path).
+//   corners.  If you used `delta` you can set `chamfer` to true to get chamfers.
+//   Positive offsets shift the path to the left (relative to the direction of the path).
 //   .
 //   When offsets shrink the path, segments cross and become invalid.  By default `offset()` checks
 //   for this situation.  To test validity the code checks that segments have distance larger than (r
@@ -568,6 +573,7 @@ function _offset_region(
 //   value is a list: [offset_path, face_list].
 // Arguments:
 //   path = the path to process.  A list of 2d points.
+//   ---
 //   r = offset radius.  Distance to offset.  Will round over corners.
 //   delta = offset distance.  Distance to offset with pointed corners.
 //   chamfer = chamfer corners when you specify `delta`.  Default: false
@@ -641,7 +647,7 @@ function offset(
     maxstep=0.1, closed=false, check_valid=true,
     quality=1, return_faces=false, firstface_index=0,
     flip_faces=false
-) =
+) = 
     is_region(path)? (
         assert(!return_faces, "return_faces not supported for regions.")
         let(
@@ -685,23 +691,19 @@ function offset(
             (len(sharpcorners)==2 && !closed) ||
             all_defined(select(sharpcorners,closed?0:1,-1))
     )
-    assert(parallelcheck, "Path turns back on itself (180 deg turn)")
+    assert(parallelcheck, "Path contains sequential parallel segments (either 180 deg turn or 0 deg turn")
     let(
         // This is a boolean array that indicates whether a corner is an outside or inside corner
         // For outside corners, the newcorner is an extension (angle 0), for inside corners, it turns backward
         // If either side turns back it is an inside corner---must check both.
         // Outside corners can get rounded (if r is specified and there is space to round them)
-        outsidecorner = [
-            for(i=[0:len(goodsegs)-1]) let(
-                prevseg=select(goodsegs,i-1)
-            ) (
-                (goodsegs[i][1]-goodsegs[i][0]) *
-                (goodsegs[i][0]-sharpcorners[i]) > 0
-            ) && (
-                (prevseg[1]-prevseg[0]) *
-                (sharpcorners[i]-prevseg[1]) > 0
-            )
-        ],
+        outsidecorner = len(sharpcorners)==2 ? [false,false]
+           :
+            [for(i=[0:len(goodsegs)-1])
+                 let(prevseg=select(goodsegs,i-1))
+                (goodsegs[i][1]-goodsegs[i][0]) * (goodsegs[i][0]-sharpcorners[i]) > 0
+                 && (prevseg[1]-prevseg[0]) * (sharpcorners[i]-prevseg[1]) > 0
+            ],
         steps = is_def(delta) ? [] : [
             for(i=[0:len(goodsegs)-1])
                         r==0 ? 0 :

@@ -1,11 +1,9 @@
 //////////////////////////////////////////////////////////////////////
 // LibFile: walls.scad
 //   Various wall constructions.
-//   To use, add the following lines to the beginning of your file:
-//   ```
+// Includes:
 //   include <BOSL2/std.scad>
 //   include <BOSL2/walls.scad>
-//   ```
 //////////////////////////////////////////////////////////////////////
 
 
@@ -93,10 +91,10 @@ module thinning_wall(h=50, l=100, thick=5, ang=30, braces=false, strut, wall, an
     wall = is_num(wall)? wall : thick/2;
 
     bevel_h = strut + (thick-wall)/2/tan(ang);
-    cp1 = find_circle_2tangents([0,0,h/2], [l2/2,0,h/2], [l1/2,0,-h/2], r=strut)[0];
-    cp2 = find_circle_2tangents([0,0,h/2], [l2/2,0,h/2], [l1/2,0,-h/2], r=bevel_h)[0];
-    cp3 = find_circle_2tangents([0,0,-h/2], [l1/2,0,-h/2], [l2/2,0,h/2], r=bevel_h)[0];
-    cp4 = find_circle_2tangents([0,0,-h/2], [l1/2,0,-h/2], [l2/2,0,h/2], r=strut)[0];
+    cp1 = circle_2tangents([0,0,h/2], [l2/2,0,h/2], [l1/2,0,-h/2], r=strut)[0];
+    cp2 = circle_2tangents([0,0,h/2], [l2/2,0,h/2], [l1/2,0,-h/2], r=bevel_h)[0];
+    cp3 = circle_2tangents([0,0,-h/2], [l1/2,0,-h/2], [l2/2,0,h/2], r=bevel_h)[0];
+    cp4 = circle_2tangents([0,0,-h/2], [l1/2,0,-h/2], [l2/2,0,h/2], r=strut)[0];
 
     z1 = h/2;
     z2 = cp1.z;

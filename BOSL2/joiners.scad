@@ -1,16 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // LibFile: joiners.scad
 //   Snap-together joiners.
-//   To use, add the following lines to the beginning of your file:
-//   ```
+// Includes:
 //   include <BOSL2/std.scad>
 //   include <BOSL2/joiners.scad>
-//   ```
 //////////////////////////////////////////////////////////////////////
 
 
 include <rounding.scad>
-include <skin.scad>
 
 
 // Section: Half Joiners
@@ -31,7 +28,7 @@ include <skin.scad>
 //   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
 //   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
 // Example:
-//   half_joiner_clear(spin=-90);
+//   half_joiner_clear();
 module half_joiner_clear(h=20, w=10, a=30, clearance=0, overlap=0.01, anchor=CENTER, spin=0, orient=UP)
 {
     dmnd_height = h*1.0;
@@ -77,8 +74,9 @@ module half_joiner_clear(h=20, w=10, a=30, clearance=0, overlap=0.01, anchor=CEN
 //   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
 //   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
 //   $slop = Printer specific slop value to make parts fit more closely.
-// Example:
-//   half_joiner(screwsize=3, spin=-90);
+// Examples(FlatSpin):
+//   half_joiner(screwsize=3);
+//   half_joiner(h=20,w=10,l=10);
 module half_joiner(h=20, w=10, l=10, a=30, screwsize=undef, guides=true, anchor=CENTER, spin=0, orient=UP)
 {
     dmnd_height = h*1.0;
@@ -136,7 +134,6 @@ module half_joiner(h=20, w=10, l=10, a=30, screwsize=undef, guides=true, anchor=
         children();
     }
 }
-//half_joiner(screwsize=3);
 
 
 
@@ -155,8 +152,9 @@ module half_joiner(h=20, w=10, l=10, a=30, screwsize=undef, guides=true, anchor=
 //   anchor = Translate so anchor point is at origin (0,0,0).  See [anchor](attachments.scad#anchor).  Default: `CENTER`
 //   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
 //   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
-// Example:
-//   half_joiner2(screwsize=3, spin=-90);
+// Examples(FlatSpin):
+//   half_joiner2(screwsize=3);
+//   half_joiner2(h=20,w=10,l=10);
 module half_joiner2(h=20, w=10, l=10, a=30, screwsize=undef, guides=true, anchor=CENTER, spin=0, orient=UP)
 {
     dmnd_height = h*1.0;
@@ -204,7 +202,7 @@ module half_joiner2(h=20, w=10, l=10, a=30, screwsize=undef, guides=true, anchor
 //   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
 //   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
 // Example:
-//   joiner_clear(spin=-90);
+//   joiner_clear();
 module joiner_clear(h=40, w=10, a=30, clearance=0, overlap=0.01, anchor=CENTER, spin=0, orient=UP)
 {
     dmnd_height = h*0.5;
@@ -239,9 +237,9 @@ module joiner_clear(h=40, w=10, a=30, clearance=0, overlap=0.01, anchor=CENTER, 
 //   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
 //   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
 //   $slop = Printer specific slop value to make parts fit more closely.
-// Examples:
-//   joiner(screwsize=3, spin=-90);
-//   joiner(w=10, l=10, h=40, spin=-90) cuboid([10, 10*2, 40], anchor=RIGHT);
+// Examples(FlatSpin):
+//   joiner(screwsize=3);
+//   joiner(w=10, l=10, h=40);
 module joiner(h=40, w=10, l=10, a=30, screwsize=undef, guides=true, anchor=CENTER, spin=0, orient=UP)
 {
     attachable(anchor,spin,orient, size=[w, 2*l, h]) {
@@ -313,12 +311,12 @@ module joiner_pair_clear(spacing=100, h=40, w=10, a=30, n=2, clearance=0, overla
 //   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
 //   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
 //   $slop = Printer specific slop value to make parts fit more closely.
+// Example(FlatSpin):
+//   joiner_pair(spacing=50, l=10);
 // Examples:
-//   joiner_pair(spacing=50, l=10, spin=-90) cuboid([10, 50+10-0.1, 40], anchor=RIGHT);
-//   joiner_pair(spacing=50, l=10, n=2, spin=-90);
-//   joiner_pair(spacing=50, l=10, n=3, alternate=false, spin=-90);
-//   joiner_pair(spacing=50, l=10, n=3, alternate=true, spin=-90);
-//   joiner_pair(spacing=50, l=10, n=3, alternate="alt", spin=-90);
+//   joiner_pair(spacing=50, l=10, n=3, alternate=false);
+//   joiner_pair(spacing=50, l=10, n=3, alternate=true);
+//   joiner_pair(spacing=50, l=10, n=3, alternate="alt");
 module joiner_pair(spacing=100, h=40, w=10, l=10, a=30, n=2, alternate=true, screwsize=undef, guides=true, anchor=CENTER, spin=0, orient=UP)
 {
     attachable(anchor,spin,orient, size=[spacing+w, 2*l, h]) {
@@ -388,19 +386,19 @@ module joiner_quad_clear(xspacing=undef, yspacing=undef, spacing1=undef, spacing
 //   l = Length of the backing to the joiners.
 //   a = Overhang angle of the joiners.
 //   n = Number of joiners in a row.  Default: 2
-//   alternate = If true (default), each joiner alternates it's orientation.  If alternate is "alt", do opposite alternating orientations.
+//   alternate = If true (default), joiners on each side alternate orientations.  If alternate is "alt", do opposite alternating orientations.
 //   screwsize = Diameter of screwhole.
 //   guides = If true, create sliding alignment guides.
 //   $slop = Printer specific slop value to make parts fit more closely.
 //   anchor = Translate so anchor point is at origin (0,0,0).  See [anchor](attachments.scad#anchor).  Default: `CENTER`
 //   spin = Rotate this many degrees around the Z axis after anchor.  See [spin](attachments.scad#spin).  Default: `0`
 //   orient = Vector to rotate top towards, after spin.  See [orient](attachments.scad#orient).  Default: `UP`
+// Example(FlatSpin):
+//   joiner_quad(spacing1=50, spacing2=50, l=10);
 // Examples:
-//   joiner_quad(spacing1=50, spacing2=50, l=10, spin=-90) cuboid([50, 50+10-0.1, 40]);
-//   joiner_quad(spacing1=50, spacing2=50, l=10, n=2, spin=-90);
-//   joiner_quad(spacing1=50, spacing2=50, l=10, n=3, alternate=false, spin=-90);
-//   joiner_quad(spacing1=50, spacing2=50, l=10, n=3, alternate=true, spin=-90);
-//   joiner_quad(spacing1=50, spacing2=50, l=10, n=3, alternate="alt", spin=-90);
+//   joiner_quad(spacing1=50, spacing2=50, l=10, n=3, alternate=false);
+//   joiner_quad(spacing1=50, spacing2=50, l=10, n=3, alternate=true);
+//   joiner_quad(spacing1=50, spacing2=50, l=10, n=3, alternate="alt");
 module joiner_quad(spacing1=undef, spacing2=undef, xspacing=undef, yspacing=undef, h=40, w=10, l=10, a=30, n=2, alternate=true, screwsize=undef, guides=true, anchor=CENTER, spin=0, orient=UP)
 {
     spacing1 = first_defined([spacing1, xspacing, 100]);
@@ -408,7 +406,7 @@ module joiner_quad(spacing1=undef, spacing2=undef, xspacing=undef, yspacing=unde
     attachable(anchor,spin,orient, size=[w+spacing1, spacing2, h]) {
         zrot_copies(n=2) {
             back(spacing2/2) {
-                joiner_pair(spacing=spacing1, n=n, h=h, w=w, l=l, a=a, screwsize=screwsize, guides=guides);
+                joiner_pair(spacing=spacing1, n=n, h=h, w=w, l=l, a=a, screwsize=screwsize, guides=guides, alternate=alternate);
             }
         }
         children();
@@ -421,7 +419,7 @@ module joiner_quad(spacing1=undef, spacing2=undef, xspacing=undef, yspacing=unde
 // Module: dovetail()
 //
 // Usage:
-//   dovetail(l|length, h|height, w|width, slope|angle, taper|back_width, [chamfer], [r|radius], [round], [$slop])
+//   dovetail(gender, w|width, h|height, slide, [slope|angle], [taper|back_width], [chamfer], [r|radius], [round], [$slop])
 //
 // Description:
 //   Produces a possibly tapered dovetail joint shape to attach to or subtract from two parts you wish to join together.
@@ -429,13 +427,16 @@ module joiner_quad(spacing1=undef, spacing2=undef, xspacing=undef, yspacing=unde
 //   it is fully closed, and then wedges tightly.  You can chamfer or round the corners of the dovetail shape for better
 //   printing and assembly, or choose a fully rounded joint that looks more like a puzzle piece.  The dovetail appears 
 //   parallel to the Y axis and projecting upwards, so in its default orientation it will slide together with a translation
-//   in the positive Y direction.  The default anchor for dovetails is BOTTOM; the default orientation depends on the gender,
-//   with male dovetails oriented UP and female ones DOWN.  
+//   in the positive Y direction.  The gender determines whether the shape is meant to be added to your model or
+//   differenced, and it also changes the anchor and orientation.  The default anchor for dovetails is BOTTOM;
+//   the default orientation depends on the gender, with male dovetails oriented UP and female ones DOWN.  
 //
 // Arguments:
-//   l / length = Length of the dovetail (amount the joint slides during assembly)
-//   h / height = Height of the dovetail
+//   gender = A string, "male" or "female", to specify the gender of the dovetail.
 //   w / width = Width (at the wider, top end) of the dovetail before tapering
+//   h / height = Height of the dovetail (the amount it projects from its base)
+//   slide = Distance the dovetail slides when you assemble it (length of sliding dovetails, thickness of regular dovetails)
+//   ---
 //   slope = slope of the dovetail.  Standard woodworking slopes are 4, 6, or 8.  Default: 6.  
 //   angle = angle (in degrees) of the dovetail.  Specify only one of slope and angle.
 //   taper = taper angle (in degrees). Dovetail gets narrower by this angle.  Default: no taper
@@ -445,68 +446,66 @@ module joiner_quad(spacing1=undef, spacing2=undef, xspacing=undef, yspacing=unde
 //   round = true to round both corners of the dovetail and give it a puzzle piece look.  Default: false.  
 //   extra = amount of extra length and base extension added to dovetails for unions and differences.  Default: 0.01
 // Example: Ordinary straight dovetail, male version (sticking up) and female version (below the xy plane)
-//   dovetail("male", length=30, width=15, height=8);
-//   right(20) dovetail("female", length=30, width=15, height=8);
+//   dovetail("male", width=15, height=8, slide=30);
+//   right(20) dovetail("female", width=15, height=8, slide=30);
 // Example: Adding a 6 degree taper (Such a big taper is usually not necessary, but easier to see for the example.)
-//   dovetail("male", length=30, width=15, height=8, taper=6);
-//   right(20) dovetail("female", length=30, width=15, height=8, taper=6);
+//   dovetail("male", w=15, h=8, slide=30, taper=6);
+//   right(20) dovetail("female", 15, 8, 30, taper=6);  // Same as above
 // Example: A block that can link to itself
 //   diff("remove")
 //     cuboid([50,30,10]){
-//       attach(BACK) dovetail("male", length=10, width=15, height=8);
-//       attach(FRONT) dovetail("female", length=10, width=15, height=8,$tags="remove");
+//       attach(BACK) dovetail("male", slide=10, width=15, height=8);
+//       attach(FRONT) dovetail("female", slide=10, width=15, height=8,$tags="remove");
 //     }
 // Example: Setting the dovetail angle.  This is too extreme to be useful.  
 //   diff("remove")
 //     cuboid([50,30,10]){
-//       attach(BACK) dovetail("male", length=10, width=15, height=8,angle=30);
-//       attach(FRONT) dovetail("female", length=10, width=15, height=8,angle=30,$tags="remove");
+//       attach(BACK) dovetail("male", slide=10, width=15, height=8, angle=30);
+//       attach(FRONT) dovetail("female", slide=10, width=15, height=8, angle=30,$tags="remove");
 //     }
 // Example: Adding a chamfer helps printed parts fit together without problems at the corners
 //   diff("remove")
 //     cuboid([50,30,10]){
-//       attach(BACK) dovetail("male", length=10, width=15, height=8,chamfer=1);
-//       attach(FRONT) dovetail("female", length=10, width=15, height=8,chamfer=1,$tags="remove");
+//       attach(BACK) dovetail("male", slide=10, width=15, height=8, chamfer=1);
+//       attach(FRONT) dovetail("female", slide=10, width=15, height=8,chamfer=1,$tags="remove");
 //     }
 // Example: Rounding the outside corners is another option
 //   diff("remove")
-//     cuboid([50,30,10]){
-//       attach(BACK) dovetail("male", length=10, width=15, height=8,radius=1,$fn=32);
-//       attach(FRONT) dovetail("female", length=10, width=15, height=8,radius=1,$tags="remove",$fn=32);
-//     }
+//   cuboid([50,30,10]) {
+//       attach(BACK)  dovetail("male", slide=10, width=15, height=8, radius=1, $fn=32);
+//       attach(FRONT, overlap=-0.1) dovetail("female", slide=10, width=15, height=8, radius=1, $tags="remove", $fn=32);
+//   }
 // Example: Or you can make a fully rounded joint
 //   $fn=32;
 //   diff("remove")
-//     cuboid([50,30,10]){
-//       attach(BACK) dovetail("male", length=10, width=15, height=8,radius=1.5, round=true);
-//       attach(FRONT) dovetail("female", length=10, width=15, height=8,radius=1.5, round=true, $tags="remove");
+//   cuboid([50,30,10]){
+//       attach(BACK) dovetail("male", slide=10, width=15, height=8, radius=1.5, round=true);
+//       attach(FRONT,overlap=-0.1) dovetail("female", slide=10, width=15, height=8, radius=1.5, round=true, $tags="remove");
 //   }
-// Example: With a long joint like this, a taper makes the joint easy to assemble.  It will go together easily and wedge tightly if you get the tolerances right.  Specifying the taper with `back_width` may be easier than using a taper angle.  
+// Example: With a long joint like this, a taper makes the joint easy to assemble.  It will go together easily and wedge tightly if you get the tolerances right.  Specifying the taper with `back_width` may be easier than using a taper angle.    
 //   cuboid([50,30,10])
-//     attach(TOP) dovetail("male", length=50, width=18, height=4, back_width=15, spin=90);
+//     attach(TOP) dovetail("male", slide=50, width=18, height=4, back_width=15, spin=90);
 //   fwd(35)
 //     diff("remove")
 //       cuboid([50,30,10])
-//         attach(TOP) dovetail("female", length=50, width=18, height=4, back_width=15, spin=90,$tags="remove");
-// Example: A series of dovtails
+//         attach(TOP) dovetail("female", slide=50, width=18, height=4, back_width=15, spin=90, $tags="remove");
+// Example: A series of dovetails forming a tail board, with the inside of the joint up.  A standard wood joint would have a zero taper. 
 //   cuboid([50,30,10])
-//     attach(BACK) xcopies(10,5) dovetail("male", length=10, width=7, height=4);
-// Example: Mating pin board for a right angle joint.  Note that the anchor method and use of `spin` ensures that the joint works even with a taper.
+//     attach(BACK) xcopies(10,5) dovetail("male", slide=10, width=7, taper=4, height=4);
+// Example: Mating pin board for a half-blind right angle joint, where the joint only shows on the side but not the front.  Note that the anchor method and use of `spin` ensures that the joint works even with a taper.
 //   diff("remove")
 //     cuboid([50,30,10])
-//       position(TOP+BACK) xcopies(10,5) dovetail("female", length=10, width=7, taper=4, height=4, $tags="remove",anchor=BOTTOM+FRONT,spin=180);
-module dovetail(gender, length, l, width, w, height, h, angle, slope, taper, back_width, chamfer, extra=0.01, r, radius, round=false, anchor=BOTTOM, spin=0, orient)
+//       position(TOP+BACK) xcopies(10,5) dovetail("female", slide=10, width=7, taper=4, height=4, $tags="remove",anchor=BOTTOM+FRONT,spin=180);
+module dovetail(gender, width, height, slide, h, w, angle, slope, taper, back_width, chamfer, extra=0.01, r, radius, round=false, anchor=BOTTOM, spin=0, orient)
 {
     radius = get_radius(r1=radius,r2=r);
-    lcount = num_defined([l,length]);
     hcount = num_defined([h,height]);
     wcount = num_defined([w,width]);
-    assert(lcount==1, "Must define exactly one of l and length");
-    assert(wcount==1, "Must define exactly one of w and width");
+    assert(is_def(slide), "Must define slide");
     assert(hcount==1, "Must define exactly one of h and height");
+    assert(wcount==1, "Must define exactly one of w and width");
     h = first_defined([h,height]);
     w = first_defined([w,width]);
-    length = first_defined([l,length]);
     orient = is_def(orient) ? orient :
         gender == "female" ? DOWN : UP;
     count = num_defined([angle,slope]);
@@ -517,11 +516,13 @@ module dovetail(gender, length, l, width, w, height, h, angle, slope, taper, bac
     assert(count3<=1 || (radius==0 && chamfer==0), "Do not specify both chamfer and radius");
     slope = is_def(slope) ? slope :
         is_def(angle) ? 1/tan(angle) :  6;
-    width = gender == "male" ? w : w + 2*$slop;
-    height = h + (gender == "female" ? 2*$slop : 0);
+    extra_slop = gender == "female" ? 2*$slop : 0;
+    width = w + extra_slop;
+    height = h + extra_slop;
+    back_width = u_add(back_width, extra_slop);
 
     front_offset = is_def(taper) ? -extra * tan(taper) :
-        is_def(back_width) ? extra * (back_width-width)/length/2 : 0;
+        is_def(back_width) ? extra * (back_width-width)/slide/2 : 0;
 
     size = is_def(chamfer) && chamfer>0 ? chamfer :
         is_def(radius) && radius>0 ? radius : 0;
@@ -532,7 +533,7 @@ module dovetail(gender, length, l, width, w, height, h, angle, slope, taper, bac
 
     smallend_half = round_corners(
         move(
-            [0,-length/2-extra,0],
+            [0,-slide/2-extra,0],
             p=[
                 [0                     , 0, height],
                 [width/2-front_offset  , 0, height],
@@ -543,13 +544,13 @@ module dovetail(gender, length, l, width, w, height, h, angle, slope, taper, bac
         method=type, cut = fullsize, closed=false
     );
     smallend_points = concat(select(smallend_half, 1, -2), [down(extra,p=select(smallend_half, -2))]);
-    offset = is_def(taper) ? -(length+extra) * tan(taper) :
+    offset = is_def(taper) ? -(slide+extra) * tan(taper) :
         is_def(back_width) ? (back_width-width) / 2 : 0;
-    bigend_points = move([offset,length+2*extra,0], p=smallend_points);
+    bigend_points = move([offset,slide+2*extra,0], p=smallend_points);
 
-    adjustment = gender == "male" ? -0.01 : 0.01;  // Adjustment for default overlap in attach()
+    adjustment = $overlap * (gender == "male" ? -1 : 1);  // Adjustment for default overlap in attach()
 
-    attachable(anchor,spin,orient, size=[width+2*offset, length, height]) {
+    attachable(anchor,spin,orient, size=[width+2*offset, slide, height]) {
         down(height/2+adjustment) {
             skin(
                 [
@@ -564,6 +565,7 @@ module dovetail(gender, length, l, width, w, height, h, angle, slope, taper, bac
 }
 
 
+// Section: Tension Clips
 
 // h is total height above 0 of the nub
 // nub extends below xy plane by distance nub/2
@@ -763,8 +765,7 @@ module snap_pin_socket(size, r, radius, l,length, d,diameter,nub_depth, snap, fi
   {  
   down(lPin/2)
     intersection() {
-      if (fixed) 
-        cube([3 * (radius + snap), radius * sqrt(2), 3 * lPin + 3 * radius], center = true);
+      cube([3 * (radius + snap), fixed ? radius * sqrt(2) : 3*(radius+snap), 3 * lPin + 3 * radius], center = true);        
       union() {
         _pin_shaft(radius,lStraight,snap,1,1,nub_depth,pointed);
         if (fins) 
@@ -776,6 +777,244 @@ module snap_pin_socket(size, r, radius, l,length, d,diameter,nub_depth, snap, fi
     }
   children();
   } 
+}
+
+
+
+// Module: rabbit_clip()
+// Usage:
+//   rabbit_clip(type, length, width, snap, thickness, depth, [compression], [clearance], [lock], [lock_clearance], [splineteps], [anchor], [orient], [spin])
+// Description:
+//   Creates a clip with two flexible ears to lock into a mating socket, or create a mask to produce the appropriate
+//   mating socket.  The clip can be made to insert and release easily, or to hold much better, or it can be
+//   created with locking flanges that will make it very hard or impossible to remove.  Unlike the snap pin, this clip
+//   is rectangular and can be made at any height, so a suitable clip could be very thin.  It's also possible to get a
+//   solid connection with a short pin.
+//   .
+//   The type parameters specifies whether to make a clip, a socket mask, or a double clip.  The length is the
+//   total nominal length of the clip.  (The actual length will be very close, but not equal to this.)  The width
+//   gives the nominal width of the clip, which is the actual width of the clip at its base.  The snap parameter
+//   gives the depth of the clip sides, which controls how easy the clip is to insert and remove.  The clip "ears" are
+//   made over-wide by the compression value.  A nonzero compression helps make the clip secure in its socket.
+//   The socket's width and length are increased by the clearance value which creates some space and can compensate
+//   for printing inaccuracy.  The socket will be slightly longer than the nominal width.  The thickness is the thickness
+//   curved line that forms the clip.  The clip depth is the amount the basic clip shape is extruded.  Be sure that you
+//   make the socket with a larger depth than the clip (try 0.4 mm) to allow ease of insertion of the clip.  The clearance
+//   value does not apply to the depth.  The splinesteps parameter increases the sampling of the clip curves.
+//   .
+//   By default clips appear with orient=UP and sockets with orient=DOWN.  
+//   .
+//   The first figure shows the dimensions of the rabbit clip.  The second figure shows the clip in red overlayed on
+//   its socket in yellow.  The left clip has a nonzero clearance, so its socket is bigger than the clip all around.
+//   The right hand locking clip has no clearance, but it has a lock clearance, which provides some space behind
+//   the lock to allow the clip to fit.  (Note that depending on your printer, this can be set to zero.)  
+//
+// Figure(2DMed):
+//   snap=1.5;
+//   comp=0.75;
+//   mid = 8.053;  // computed in rabbit_clip
+//   tip = [-4.58,18.03];
+//   translate([9,3]){
+//   back_half()
+//      rabbit_clip("pin",width=12, length=18, depth=1, thickness = 1, compression=comp, snap=snap, orient=BACK);
+//   color("blue"){
+//      stroke([[6,0],[6,18]],width=0.1);
+//      stroke([[6+comp, 12], [6+comp, 18]], width=.1);
+//   }
+//   color("red"){
+//      stroke([[6-snap,mid], [6,mid]], endcaps="arrow2",width=0.15);
+//      translate([6+.4,mid-.15])text("snap",size=1,valign="center");
+//      translate([6+comp/2,19.5])text("compression", size=1, halign="center");
+//      stroke([[6+comp/2,19.3], [6+comp/2,17.7]], endcap2="arrow2", width=.15);
+//      fwd(1.1)text("width",size=1,halign="center");
+//      xflip_copy()stroke([[2,-.7], [6,-.7]], endcap2="arrow2", width=.15);     
+//      move([-6.7,mid])rot(90)text("length", size=1, halign="center");
+//      stroke([[-7,10.3], [-7,18]], width=.15, endcap2="arrow2");
+//      stroke([[-7,0], [-7,5.8]], width=.15,endcap1="arrow2");
+//      stroke([tip, tip-[0,1]], width=.15);
+//      move([tip.x+2,19.5])text("thickness", halign="center",size=1);
+//      stroke([[tip.x+2, 19.3], tip+[.1,.1]], width=.15, endcap2="arrow2");
+//   }
+//   }
+//
+// Figure(2DMed):
+//   snap=1.5;
+//   comp=0;
+//   translate([29,3]){
+//   back_half()
+//      rabbit_clip("socket", width=12, length=18, depth=1, thickness = 1, compression=comp, snap=snap, orient=BACK,lock=true);
+//   color("red")back_half()
+//      rabbit_clip("pin",width=12, length=18, depth=1, thickness = 1, compression=comp, snap=snap,
+//               orient=BACK,lock=true,lock_clearance=1);
+//   }
+//   translate([9,3]){
+//   back_half()
+//      rabbit_clip("socket", clearance=.5,width=12, length=18, depth=1, thickness = 1,
+//                  compression=comp, snap=snap, orient=BACK,lock=false);
+//   color("red")back_half()
+//      rabbit_clip("pin",width=12, length=18, depth=1, thickness = 1, compression=comp, snap=snap,
+//               orient=BACK,lock=false,lock_clearance=1);
+//   }
+// Arguments:
+//   type = One of "pin",  "socket", "male", "female" or "double" to specify what to make.
+//   length = nominal clip length
+//   width = nominal clip width
+//   snap = depth of hollow on the side of the clip
+//   thickness = thickness of the clip "line"
+//   depth = amount to extrude clip (give extra room for the socket, about 0.4mm)
+//   compression = excess width at the "ears" to lock more tightly.  Default: 0.1
+//   clearance = extra space in the socket for easier insertion.  Default: 0.1
+//   lock = set to true to make a locking clip that may be irreversible.  Default: false
+//   lock_clearance = give clearance for the lock.  Default: 0
+//   splinesteps = number of samples in the curves of the clip.  Default: 8
+//   anchor = anchor point for clip
+//   orient = clip orientation.  Default: UP for pins, DOWN for sockets
+//   spin = spin the clip.  Default: 0
+//
+// Example:  Here are several sizes that work printed in PLA on a Prusa MK3, with default clearance of 0.1 and a depth of 5
+//   module test_pair(length, width, snap, thickness, compression, lock=false)
+//   {
+//     depth = 5;
+//     extra_depth = 10;// Change this to 0.4 for closed sockets
+//     cuboid([max(width+5,12),12, depth], chamfer=.5, edges=[FRONT,"Y"], anchor=BOTTOM)
+//         attach(BACK)
+//           rabbit_clip(type="pin",length=length, width=width,snap=snap,thickness=thickness,depth=depth,
+//                       compression=compression,lock=lock);
+//     right(width+13)
+//     diff("remove")
+//         cuboid([width+8,max(12,length+2),depth+3], chamfer=.5, edges=[FRONT,"Y"], anchor=BOTTOM)
+//             attach(BACK)
+//               rabbit_clip(type="socket",length=length, width=width,snap=snap,thickness=thickness,depth=depth+extra_depth,
+//                           lock=lock,compression=0,$tags="remove");
+//   }
+//   left(37)ydistribute(spacing=28){
+//     test_pair(length=6, width=7, snap=0.25, thickness=0.8, compression=0.1);
+//     test_pair(length=3.5, width=7, snap=0.1, thickness=0.8, compression=0.1);  // snap = 0.2 gives a firmer connection
+//     test_pair(length=3.5, width=5, snap=0.1, thickness=0.8, compression=0.1);  // hard to take apart
+//   }
+//   right(17)ydistribute(spacing=28){
+//     test_pair(length=12, width=10, snap=1, thickness=1.2, compression=0.2);
+//     test_pair(length=8, width=7, snap=0.75, thickness=0.8, compression=0.2, lock=true); // With lock, very firm and irreversible
+//     test_pair(length=8, width=7, snap=0.75, thickness=0.8, compression=0.2, lock=true); // With lock, very firm and irreversible
+//   }
+// Example: Double clip to connect two sockets
+//   rabbit_clip("double",length=8, width=7, snap=0.75, thickness=0.8, compression=0.2,depth=5);
+// Example:  A modified version of the clip that acts like a backpack strap clip, where it locks tightly but you can squeeze to release. 
+//   cuboid([25,15,5],anchor=BOTTOM)
+//       attach(BACK)rabbit_clip("pin", length=25, width=25, thickness=1.5, snap=2, compression=0, lock=true, depth=5, lock_clearance=3);
+//   left(32)
+//   diff("remove")
+//   cuboid([30,30,11],orient=BACK,anchor=BACK){
+//       attach(BACK)rabbit_clip("socket", length=25, width=25, thickness=1.5, snap=2, compression=0, lock=true, depth=5.5, lock_clearance=3,$tags="remove");
+//       xflip_copy()
+//         position(FRONT+LEFT)
+//         xscale(0.8)
+//         zcyl(l=20,r=13.5, $tags="remove",$fn=64);
+//   }
+module rabbit_clip(type, length, width,  snap, thickness, depth, compression=0.1,  clearance=.1, lock=false, lock_clearance=0,
+                   splinesteps=8, anchor, orient, spin=0)
+{
+  assert(is_num(width) && width>0,"Width must be a positive value");
+  assert(is_num(length) && length>0, "Length must be a positive value");
+  assert(is_num(thickness) && thickness>0, "Thickness must be a positive value");  
+  assert(is_num(snap) && snap>=0, "Snap must be a non-negative value");
+  assert(is_num(depth) && depth>0, "Depth must be a positive value");
+  assert(is_num(compression) && compression >= 0, "Compression must be a nonnegative value");
+  assert(is_bool(lock));
+  assert(is_num(lock_clearance));
+  legal_types = ["pin","socket","male","female","double"];
+  assert(in_list(type,legal_types),str("type must be one of ",legal_types));
+  
+  if (type=="double") {
+    attachable(size=[width+2*compression, depth, 2*length], anchor=default(anchor,BACK), spin=spin, orient=default(orient,BACK)){
+      union(){
+        rabbit_clip("pin", length=length, width=width, snap=snap, thickness=thickness, depth=depth, compression=compression,
+                    lock=lock, anchor=BOTTOM, orient=UP);
+        rabbit_clip("pin", length=length, width=width, snap=snap, thickness=thickness, depth=depth, compression=compression,
+                    lock=lock, anchor=BOTTOM, orient=DOWN);
+        cuboid([width-thickness, depth, thickness]);
+      }
+      children();
+    }
+  } else {
+    anchor = default(anchor,BOTTOM);
+    is_pin = in_list(type,["pin","male"]);
+    default_overlap = 0.01 * (is_pin?1:-1);    // Shift by this much to undo default overlap
+    extra = 0.02;  // Amount of extension below nominal based position for the socket, must exceed default overlap of 0.01
+    clearance = is_pin ? 0 : clearance;
+    compression = is_pin ? compression : 0;
+    orient =  is_def(orient) ? orient
+            : is_pin ? UP
+            : DOWN;
+    earwidth = 2*thickness+snap;
+    point_length = earwidth/2.15;
+    // The adjustment is using cos(theta)*earwidth/2 and sin(theta)*point_length, but the computation
+    // is obscured because theta is atan(length/2/snap)
+    scaled_len = length - 0.5 * (earwidth * snap + point_length * length) / sqrt(sqr(snap)+sqr(length/2));
+    bottom_pt = [0,max(scaled_len*0.15+thickness, 2*thickness)];
+    ctr = [width/2,scaled_len] + line_normal([width/2-snap, scaled_len/2], [width/2, scaled_len]) * earwidth/2;
+    inside_pt = circle_circle_tangents(bottom_pt, 0, ctr, earwidth/2)[0][1];
+    sidepath =[
+               [width/2,0],
+               [width/2-snap,scaled_len/2],
+               [width/2+(is_pin?compression:0), scaled_len],
+               ctr - point_length * line_normal([width/2,scaled_len], inside_pt),
+               inside_pt
+              ];
+    fullpath = concat(
+                      sidepath,
+                      [bottom_pt], 
+                      reverse(apply(xflip(),sidepath))
+                      );
+    assert(fullpath[4].y < fullpath[3].y, "Pin is too wide for its length");
+    
+    snapmargin = -snap + select(sidepath,-1).x;// - compression;
+    if (is_pin){
+      if (snapmargin<0) echo("WARNING: The snap is too large for the clip to squeeze to fit its socket")
+      echo(snapmargin=snapmargin);
+    }
+    // Force tangent to be vertical at the outer edge of the clip to avoid overshoot
+    fulltangent = list_set(path_tangents(fullpath, uniform=false),[2,8], [[0,1],[0,-1]]);
+
+    subset = is_pin ? [0:10] : [0,1,2,3, 7,8,9,10];  // Remove internal points from the socket
+    tangent = select(fulltangent, subset);
+    path = select(fullpath, subset);
+    
+    socket_smooth = .04;
+    pin_smooth = [.075, .075, .15, .12, .06];
+    smoothing = is_pin
+                  ? concat(pin_smooth, reverse(pin_smooth))
+                  : let(side_smooth=select(pin_smooth, 0, 2))
+                    concat(side_smooth, [socket_smooth], reverse(side_smooth));
+    bez = path_to_bezier(path,relsize=smoothing,tangents=tangent);
+    rounded = bezier_path(bez,splinesteps=splinesteps);
+    bounds = pointlist_bounds(rounded);
+    //kk = search([bounds[1].y], subindex(rounded,1));
+    //echo(rounded[kk[0]]);
+    extrapt = is_pin ? [] : [rounded[0] - [0,extra]];
+    finalpath = is_pin ? rounded
+                       : let(withclearance=offset(rounded, r=-clearance))
+                         concat( [[withclearance[0].x,-extra]],
+                                 withclearance,
+                                 [[-withclearance[0].x,-extra]]);
+    attachable(size=[bounds[1].x-bounds[0].x, depth, bounds[1].y-bounds[0].y], anchor=anchor, spin=spin, orient=orient){
+      xrot(90)
+        translate([0,-(bounds[1].y-bounds[0].y)/2+default_overlap,-depth/2])
+        linear_extrude(height=depth, convexity=10) {
+            if (lock)
+              xflip_copy()
+              right(clearance)
+              polygon([sidepath[1]+[-thickness/10,lock_clearance],
+                       sidepath[2],
+                       [sidepath[2].x,sidepath[1].y+lock_clearance]]);
+            if (is_pin)
+              offset_stroke(finalpath, width=[thickness,0]);
+            else
+              polygon(finalpath);
+        }
+      children();
+    }
+  }
 }
 
 

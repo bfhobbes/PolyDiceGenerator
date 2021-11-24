@@ -1,10 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // LibFile: strings.scad
 //   String manipulation and formatting functions.
-//   To use, add the following lines to the beginning of your file:
-//   ```
-//   use <BOSL2/std.scad>
-//   ```
+// Includes:
+//   include <BOSL2/std.scad>
 //////////////////////////////////////////////////////////////////////
 
 
@@ -196,7 +194,7 @@ function str_frac(str,mixed=true,improper=true,signed=true) =
     signed && str[0]=="-" ? -str_frac(substr(str,1),mixed=mixed,improper=improper,signed=false) :
     signed && str[0]=="+" ?  str_frac(substr(str,1),mixed=mixed,improper=improper,signed=false) :
     mixed ? (                      
-        str_find(str," ")>0 || is_undef(str_find(str,"/"))? (
+        !in_list(str_find(str," "), [undef,0]) || is_undef(str_find(str,"/"))? (
             let(whole = str_split(str,[" "]))
             _str_int_recurse(whole[0],10,len(whole[0])-1) + str_frac(whole[1], mixed=false, improper=improper, signed=false)
         ) : str_frac(str,mixed=false, improper=improper)
@@ -292,12 +290,12 @@ function _str_cmp_recurse(str,sindex,pattern,plen,pindex=0,) =
 // Usage:
 //   str_find(str,pattern,[last],[all],[start])
 // Description:
-//   Searches input string `str` for the string `pattern` and returns the index or indices of the matches in `str`.  
-//   By default str_find() returns the index of the first match in `str`.  If `last` is true then it returns the index of the last match.
+//   Searches input string `str` for the string `pattern` and returns the index or indices of the matches in `str`.
+//   By default `str_find()` returns the index of the first match in `str`.  If `last` is true then it returns the index of the last match.
 //   If the pattern is the empty string the first match is at zero and the last match is the last character of the `str`.
 //   If `start` is set then the search begins at index start, working either forward and backward from that position.  If you set `start`
-//   and `last` is true then the search will find the pattern if it begins at index `start`.  If no match exists, returns undef. 
-//   If you set `all` to true then all str_find() returns all of the matches in a list, or an empty list if there are no matches.  
+//   and `last` is true then the search will find the pattern if it begins at index `start`.  If no match exists, returns `undef`.
+//   If you set `all` to true then `str_find()` returns all of the matches in a list, or an empty list if there are no matches.
 // Arguments:
 //   str = String to search.
 //   pattern = string pattern to search for
@@ -626,7 +624,6 @@ function is_letter(s) =
 // Arguments:
 //   fmt = The formatting string, with placeholders to format the values into.
 //   vals = The list of values to format.
-//   use_nbsp = Pad fields with HTML entity `&nbsp;` instead of spaces.
 // Example(NORENDER):
 //   str_format("The value of {} is {:.14f}.", ["pi", PI]);  // Returns: "The value of pi is 3.14159265358979."
 //   str_format("The value {1:f} is known as {0}.", ["pi", PI]);  // Returns: "The value 3.141593 is known as pi."
@@ -634,7 +631,7 @@ function is_letter(s) =
 //   str_format("{:-5s}{:i}{:b}", ["foo", 12e3, 5]);  // Returns: "foo  12000true"
 //   str_format("{:-10s}{:.3f}", ["plecostamus",27.43982]);  // Returns: "plecostamus27.440"
 //   str_format("{:-10.9s}{:.3f}", ["plecostamus",27.43982]);  // Returns: "plecostam 27.440"
-function str_format(fmt, vals, use_nbsp=false) =
+function str_format(fmt, vals) =
     let(
         parts = str_split(fmt,"{")
     ) str_join([
@@ -676,7 +673,7 @@ function str_format(fmt, vals, use_nbsp=false) =
                     typ=="G"? upcase(fmt_float(val,default(prec,6))) :
                     assert(false,str("Unknown format type: ",typ)),
                 padlen = max(0,wid-len(unpad)),
-                padfill = str_join([for (i=[0:1:padlen-1]) zero? "0" : use_nbsp? "&nbsp;" : " "]),
+                padfill = str_join([for (i=[0:1:padlen-1]) zero? "0" : " "]),
                 out = left? str(unpad, padfill) : str(padfill, unpad)
             )
             out, raw
@@ -692,7 +689,6 @@ function str_format(fmt, vals, use_nbsp=false) =
 // Arguments:
 //   fmt = The formatting string, with placeholders to format the values into.
 //   vals = The list of values to format.
-//   use_nbsp = Pad fields with HTML entity `&nbsp;` instead of spaces.
 // Example(NORENDER):
 //   echofmt("The value of {} is {:.14f}.", ["pi", PI]);  // ECHO: "The value of pi is 3.14159265358979."
 //   echofmt("The value {1:f} is known as {0}.", ["pi", PI]);  // ECHO: "The value 3.141593 is known as pi."
@@ -700,8 +696,96 @@ function str_format(fmt, vals, use_nbsp=false) =
 //   echofmt("{:-5s}{:i}{:b}", ["foo", 12e3, 5]);  // ECHO: "foo  12000true"
 //   echofmt("{:-10s}{:.3f}", ["plecostamus",27.43982]);  // ECHO: "plecostamus27.440"
 //   echofmt("{:-10.9s}{:.3f}", ["plecostamus",27.43982]);  // ECHO: "plecostam 27.440"
-function echofmt(fmt, vals, use_nbsp=false) = echo(str_format(fmt,vals,use_nbsp));
-module echofmt(fmt, vals, use_nbsp=false) echo(str_format(fmt,vals,use_nbsp));
+function echofmt(fmt, vals) = echo(str_format(fmt,vals));
+module echofmt(fmt, vals) {
+   no_children($children);
+   echo(str_format(fmt,vals));
+}
+
+
+// Function: str_pad()
+// Usage:
+//   padded = str_pad(str, length, char, [left]);
+// Description:
+//   Pad the given string `str` with to length `length` with the specified character,
+//   which must be a length 1 string.  If left is true then pad on the left, otherwise
+//   pad on the right.  If the string is longer than the specified length the full string
+//   is returned unchanged.  
+// Arguments:
+//   str = string to pad
+//   length = length to pad to
+//   char = character to pad with.  Default: " " (space)
+//   left = if true, pad on the left side.  Default: false
+function str_pad(str,length,char=" ",left=false) =
+  assert(is_str(str))
+  assert(is_str(char) && len(char)==1, "char must be a single character string")
+  assert(is_bool(left))
+  let(
+    padding = str_join(repeat(char,length-len(str)))
+  )
+  left ? str(padding,str) : str(str,padding);
+
+
+// Function str_replace_char()
+// Usage:
+//   newstr = str_replace_char(str, char, replace)
+// Description:
+//   Replace every occurence of `char` in the input string with the string `replace` which
+//   can be any string.  
+function str_replace_char(str,char,replace) =
+   assert(is_str(str))
+   assert(is_str(char) && len(char)==1, "Search pattern 'char' must be a a single character string")
+   assert(is_str(replace))
+   str_join([for(c=str) c==char ? replace : c]);
+
+
+// Function: matrix_strings()
+// Usage:
+//   matrix_strings(M, [sig], [eps])
+// Description:
+//   Convert a numerical matrix into a matrix of strings where every column
+//   is the same width so it will display in neat columns when printed.
+//   Values below eps will display as zero.  The matrix can include nans, infs
+//   or undefs and the rows can be different lengths.  
+// Arguments:
+//   M = numerical matrix to convert
+//   sig = significant digits to display.  Default: 4
+//   eps = values smaller than this are shown as zero.  Default: 1e-9
+function matrix_strings(M, sig=4, eps=1e-9) = 
+   let(
+       columngap = 1,
+       figure_dash = chr(8210),
+       space_punc = chr(8200),
+       space_figure = chr(8199),
+       strarr=
+         [for(row=M)
+             [for(entry=row)
+                 let(
+                     text = is_undef(entry) ? "und"
+                          : abs(entry) < eps ? "0"             // Replace hyphens with figure dashes
+                          : str_replace_char(fmt_float(entry, sig),"-",figure_dash),
+                     have_dot = is_def(str_find(text, "."))
+                 )
+                 // If the text lacks a dot we add a space the same width as a dot to
+                 // maintain alignment
+                 str(have_dot ? "" : space_punc, text)
+             ]
+         ],
+       maxwidth = max([for(row=M) len(row)]),
+       // Find maximum length for each column.  Some entries in a column may be missing.  
+       maxlen = [for(i=[0:1:maxwidth-1])
+                    max(
+                         [for(j=idx(M)) i>=len(M[j]) ? 0 : len(strarr[j][i])])
+                ],
+       padded =
+         [for(row=strarr)
+            str_join([for(i=idx(row))
+                            let(
+                                extra = ends_with(row[i],"inf") ? 1 : 0
+                            )
+                            str_pad(row[i],maxlen[i]+extra+(i==0?0:columngap),space_figure,left=true)])]
+    )
+    padded;
 
 
 // vim: expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap
