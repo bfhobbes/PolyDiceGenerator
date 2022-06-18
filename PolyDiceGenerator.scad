@@ -31,6 +31,7 @@ underscore_font="LiberationSerif:style=Bold";
 symbol_font="SWAstro";
 
 /* [Dice to Draw] */
+drawOnly=""; //["",d4,d6,d8,d10,d00,d12,d20]
 d2=true;
 d3=true;
 d4=true;
@@ -420,19 +421,28 @@ d20_dl_rotate=[0,-120,0,120,-120,0,120,0,0,-120,120,120,-120,120,120,0,-120,0,0,
 
 spacing=d20_size*1.5;
 
-if(d2) move(x=spacing,y=-spacing) drawd2();
-if(d3) move(x=-spacing,y=-spacing*2) drawd3();
-if(d4) fwd(spacing) drawd4();
-if(d4c) move(x=-spacing,y=-spacing) drawd4c();
-if(d4i) move(x=spacing,y=-spacing*2) drawd4i();
-if(d4p) fwd(spacing*2) drawd4p();
-if(d6) drawd6();
-if(d8) back(spacing) drawd8();
-if(d10) move(x=-spacing,y=spacing) drawd10();
-if(d00) left(spacing) drawd00();
-if(d12) move(x=spacing,y=spacing) drawd12();
-if(d12r) back(spacing*2) drawd12r();
-if(d20) right(spacing) drawd20();
+if(drawOnly=="d4") drawd4();
+else if(drawOnly=="d6") drawd6();
+else if(drawOnly=="d8") drawd8();
+else if(drawOnly=="d10") drawd10();
+else if(drawOnly=="d00") drawd00();
+else if(drawOnly=="d12") drawd12();
+else if(drawOnly=="d20") drawd20();
+else {
+    if(d2) move(x=spacing,y=-spacing) drawd2();
+    if(d3) move(x=-spacing,y=-spacing*2) drawd3();
+    if(d4) fwd(spacing) drawd4();
+    if(d4c) move(x=-spacing,y=-spacing) drawd4c();
+    if(d4i) move(x=spacing,y=-spacing*2) drawd4i();
+    if(d4p) fwd(spacing*2) drawd4p();
+    if(d6) drawd6();
+    if(d8) back(spacing) drawd8();
+    if(d10) move(x=-spacing,y=spacing) drawd10();
+    if(d00) left(spacing) drawd00();
+    if(d12) move(x=spacing,y=spacing) drawd12();
+    if(d12r) back(spacing*2) drawd12r();
+    if(d20) right(spacing) drawd20();
+} 
 
 txt_font=str_strip(text_font,"\"");
 under_font=str_strip(underscore_font,"\"");
